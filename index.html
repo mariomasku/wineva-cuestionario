@@ -1,0 +1,870 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Cuestionario de requisitos · masku.dev</title>
+<style>
+  :root {
+    --tinta: #1d1f24;
+    --suave: #5d6470;
+    --linea: #dcdfe4;
+    --fondo: #f5f4f1;
+    --tarjeta: #ffffff;
+    --acento: #7a1f3d;
+    --acento-claro: #f6e9ee;
+    --ok: #1f7a4d;
+    --radio: 12px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    font: 17px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--tinta);
+    background: var(--fondo);
+    padding-bottom: 110px;
+  }
+  .contenedor { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+
+  /* Cabecera */
+  header.cabecera { background: var(--tarjeta); border-bottom: 1px solid var(--linea); }
+  header.cabecera .contenedor { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 14px; padding-bottom: 14px; }
+  .logo { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--tinta); }
+  .logo svg { display: block; height: 30px; width: auto; }
+  .cabecera .etiqueta { font-size: 14px; color: var(--suave); text-align: right; }
+
+  /* Progreso */
+  .progreso { position: sticky; top: 0; z-index: 10; background: var(--fondo); padding: 10px 0 8px; }
+  .progreso .barra { height: 6px; background: var(--linea); border-radius: 99px; overflow: hidden; }
+  .progreso .relleno { height: 100%; width: 0; background: var(--acento); transition: width .3s ease; }
+  .progreso .texto { font-size: 13px; color: var(--suave); margin-top: 4px; }
+
+  h1 { font-size: 28px; line-height: 1.2; margin: 28px 0 8px; }
+  .subtitulo { color: var(--suave); margin: 0 0 20px; }
+
+  .tarjeta { background: var(--tarjeta); border: 1px solid var(--linea); border-radius: var(--radio); padding: 20px; margin: 16px 0; }
+  .tarjeta p:first-child { margin-top: 0; }
+  .tarjeta p:last-child { margin-bottom: 0; }
+  .aviso { border-left: 4px solid var(--acento); }
+  .aviso h2 { font-size: 16px; margin: 0 0 6px; }
+  .aviso p { font-size: 15px; color: var(--suave); }
+  .firma { color: var(--suave); }
+  ul.puntos { padding-left: 20px; margin: 8px 0; }
+
+  section.seccion { margin-top: 32px; }
+  section.seccion > h2 { font-size: 22px; margin: 0 0 4px; display: flex; gap: 10px; align-items: baseline; }
+  section.seccion > h2 .num { color: var(--acento); font-variant-numeric: tabular-nums; }
+  .intro-seccion { color: var(--suave); margin: 4px 0 12px; }
+  .destacado { background: var(--acento-claro); border: 1px solid #ecd3dc; border-radius: var(--radio); padding: 14px 16px; margin: 10px 0 14px; }
+
+  /* Preguntas */
+  .pregunta { background: var(--tarjeta); border: 1px solid var(--linea); border-radius: var(--radio); padding: 18px; margin: 12px 0; }
+  .pregunta > .enunciado, .pregunta legend.enunciado { font-weight: 600; margin: 0 0 10px; padding: 0; display: block; }
+  .ayuda { font-size: 14px; color: var(--suave); margin: -4px 0 10px; }
+  fieldset { margin: 0; min-width: 0; }
+  /* La leyenda flota para quedarse dentro de la tarjeta y no sobre el borde. */
+  fieldset.pregunta > legend.enunciado { float: left; width: 100%; }
+  fieldset.pregunta > legend.enunciado + * { clear: both; }
+
+  .opciones { display: grid; gap: 8px; }
+  @media (min-width: 620px) { .opciones.dos { grid-template-columns: 1fr 1fr; } }
+  label.opcion {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 14px; border: 1px solid var(--linea); border-radius: 10px;
+    cursor: pointer; background: #fff; transition: background .15s, border-color .15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  label.opcion:hover { border-color: #b9bec6; }
+  label.opcion:has(input:checked) { background: var(--acento-claro); border-color: var(--acento); }
+  label.opcion input { accent-color: var(--acento); width: 18px; height: 18px; margin: 0; flex: none; }
+
+  .campo { display: block; margin-top: 10px; }
+  .campo > span { display: block; font-size: 14px; color: var(--suave); margin-bottom: 4px; }
+  input[type=text], input[type=email], input[type=number], textarea, select {
+    width: 100%; font: inherit; color: inherit;
+    padding: 10px 12px; border: 1px solid var(--linea); border-radius: 10px; background: #fff;
+  }
+  input:focus, textarea:focus, select:focus { outline: 2px solid var(--acento); outline-offset: 1px; border-color: var(--acento); }
+  textarea { min-height: 84px; resize: vertical; }
+  .con-unidad { display: flex; align-items: center; gap: 8px; }
+  .con-unidad input { max-width: 160px; }
+  .con-unidad .unidad { color: var(--suave); font-size: 15px; }
+  .oculto { display: none !important; }
+
+  .numeros { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .numeros label span { display: block; font-size: 14px; color: var(--suave); margin-bottom: 4px; }
+
+  .matriz-fila { padding: 10px 0; border-top: 1px dashed var(--linea); }
+  .matriz-fila:first-of-type { border-top: 0; padding-top: 0; }
+  .matriz-fila .fila-nombre { font-weight: 600; font-size: 15px; margin-bottom: 6px; }
+  .matriz-fila .opciones { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+
+  /* Calculadora */
+  .calc-grupo + .calc-grupo { margin-top: 18px; }
+  .calc-grupo h3, .resultados h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--acento); margin: 0 0 4px; }
+  .calc-fila { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--linea); }
+  .calc-fila:first-of-type { border-top: 0; }
+  .calc-fila .nombre { font-size: 15px; }
+  .calc-fila .nombre small { display: block; font-size: 13px; color: var(--suave); }
+  .calc-fila .valor { display: grid; grid-template-columns: 96px 72px; align-items: center; gap: 8px; }
+  .calc-fila input { text-align: right; padding: 8px 10px; font-variant-numeric: tabular-nums; }
+  .calc-fila .unidad { font-size: 13px; color: var(--suave); }
+  .resultados { margin-top: 22px; padding: 16px; border-radius: 10px; background: #fafafa; border: 1px solid var(--linea); }
+  .res-fila { display: grid; grid-template-columns: 1fr auto; gap: 12px; padding: 7px 0; font-variant-numeric: tabular-nums; }
+  .res-fila span:last-child { text-align: right; font-weight: 600; min-width: 90px; }
+  .res-fila.separa { border-top: 1px solid var(--linea); margin-top: 6px; padding-top: 12px; }
+  .res-fila.total { font-size: 18px; font-weight: 700; }
+  .res-fila.total span:last-child { color: var(--acento); }
+  .titular { margin-top: 16px; padding: 18px; border-radius: var(--radio); background: var(--acento); color: #fff; font-size: 19px; line-height: 1.45; }
+  .titular strong { font-size: 1.1em; }
+
+  /* Barra inferior */
+  .acciones { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: rgba(255,255,255,.96); border-top: 1px solid var(--linea); backdrop-filter: blur(6px); }
+  .acciones .contenedor { display: flex; gap: 10px; align-items: center; padding-top: 12px; padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+  .acciones .estado { flex: 1; font-size: 13px; color: var(--suave); min-width: 0; }
+  button { font: inherit; font-weight: 600; border-radius: 10px; padding: 12px 18px; cursor: pointer; border: 1px solid var(--acento); }
+  button.secundario { background: #fff; color: var(--acento); }
+  button.principal { background: var(--acento); color: #fff; }
+  button:disabled { opacity: .6; cursor: wait; }
+
+  .mensaje { padding: 14px 16px; border-radius: var(--radio); margin: 16px 0; }
+  .mensaje.error { background: #fdecec; border: 1px solid #f3c2c2; color: #8a1c1c; }
+  .mensaje.ok { background: #e8f5ee; border: 1px solid #bfe3cf; color: var(--ok); }
+
+  .gracias { text-align: center; padding: 48px 20px; }
+  .gracias h2 { font-size: 26px; margin: 0 0 10px; }
+
+  footer.pie { text-align: center; font-size: 13px; color: var(--suave); margin: 40px 0 10px; }
+  .botcheck { display: none; }
+</style>
+</head>
+<body>
+
+<header class="cabecera">
+  <div class="contenedor">
+    <a class="logo" href="https://masku.dev" target="_blank" rel="noopener" aria-label="masku.dev">
+      <svg viewBox="0 0 190 36" role="img" aria-hidden="true">
+        <rect x="0" y="2" width="32" height="32" rx="8" fill="#1d1f24"/>
+        <path d="M9 25V12l7 8 7-8v13" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="42" y="26" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="22" font-weight="700" fill="#1d1f24">masku<tspan fill="#7a1f3d">.dev</tspan></text>
+      </svg>
+    </a>
+    <span class="etiqueta">Cuestionario de requisitos</span>
+  </div>
+</header>
+
+<div class="progreso" aria-hidden="true">
+  <div class="contenedor">
+    <div class="barra"><div class="relleno" id="relleno"></div></div>
+    <div class="texto" id="textoProgreso">0 de 0 preguntas respondidas</div>
+  </div>
+</div>
+
+<main class="contenedor" id="principal">
+  <h1>Cómo trabajáis hoy</h1>
+  <p class="subtitulo">Cuestionario para preparar la propuesta y la demostración de diciembre.</p>
+
+  <div class="tarjeta">
+    <p><strong>Hola, Roberto:</strong></p>
+    <p>Gracias por la llamada del otro día. Te dejo el cuestionario que te comenté. Con él quiero entender bien cómo trabajáis, para preparar la demostración de diciembre con vuestros datos y decirte con exactitud qué puedo resolver y cuánto tiempo os ahorra.</p>
+    <ul class="puntos">
+      <li>Hay cosas que ya me contaste: las he dejado escritas para que solo las confirmes o corrijas.</li>
+      <li>Ninguna pregunta es obligatoria. Si no sabes una cifra exacta, pon una aproximada.</li>
+      <li>Con el botón <strong>Guardar</strong> de abajo puedes dejarlo a medias y seguir otro día desde este mismo dispositivo y navegador.</li>
+      <li>Se tarda unos 25–30 minutos. Casi todo se responde marcando opciones.</li>
+    </ul>
+    <p class="firma">Mario · masku.dev</p>
+  </div>
+
+  <div class="tarjeta aviso">
+    <h2>Privacidad de tus datos</h2>
+    <p>Todos los datos recogidos en este cuestionario son de uso exclusivamente privado. Se utilizarán únicamente para la recogida de requisitos y la elaboración de un plan de desarrollo y una propuesta de aplicación web. No se cederán a terceros ni se usarán para ningún otro fin.</p>
+  </div>
+
+  <div id="avisoEnviado" class="mensaje ok oculto"></div>
+
+  <form id="formulario" novalidate>
+    <input type="checkbox" name="botcheck" class="botcheck" tabindex="-1" autocomplete="off">
+    <div id="secciones"></div>
+
+    <section class="seccion" id="seccion-calc">
+      <h2><span class="num">13.</span> Calculadora: lo que os cuesta hoy meter datos a mano</h2>
+      <p class="intro-seccion">Viene rellena con lo que me contaste. Cambia lo que haga falta: los resultados se recalculan al momento y me llegan con el resto de respuestas.</p>
+      <div class="pregunta">
+        <div class="calc-datos" id="calcDatos"></div>
+        <div class="resultados" id="calcResultados"></div>
+        <div class="titular" id="calcTitular"></div>
+      </div>
+    </section>
+
+    <div class="tarjeta aviso" style="margin-top:32px">
+      <h2>Antes de enviar</h2>
+      <p>Al pulsar «Enviar respuestas» me llegarán tus respuestas. Recuerda: solo las usaré para preparar el plan de desarrollo y la propuesta de aplicación web.</p>
+    </div>
+    <div id="mensajeEnvio" class="mensaje oculto" role="status"></div>
+  </form>
+
+  <div id="gracias" class="tarjeta gracias oculto">
+    <h2>¡Gracias, Roberto!</h2>
+    <p>He recibido tus respuestas. Las reviso y te escribo para preparar la visita.</p>
+    <p class="firma">Mario · masku.dev</p>
+  </div>
+
+  <footer class="pie">masku.dev · Cuestionario de requisitos</footer>
+</main>
+
+<div class="acciones">
+  <div class="contenedor">
+    <div class="estado" id="estadoGuardado">Sin guardar todavía</div>
+    <button type="button" class="secundario" id="btnGuardar">Guardar</button>
+    <button type="button" class="principal" id="btnEnviar">Enviar respuestas</button>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   CONFIGURACIÓN
+   Clave de acceso de Web3Forms: se obtiene gratis en
+   https://web3forms.com escribiendo el email donde quieres recibir
+   las respuestas. Pégala aquí entre las comillas.
+   ================================================================ */
+const WEB3FORMS_KEY = "34315c81-d1cd-4eef-80b1-514a648b8290";
+const CLAVE_GUARDADO = "cuestionario-masku-roberto-v1";
+
+/* ================================================================
+   PREGUNTAS
+   Tipos: text, email, number, textarea, radio, checkbox, select,
+   matrix (una fila por elemento), numbers (varios números).
+   «extras»: campos que acompañan a la pregunta; con «cuando» solo
+   se enseñan si la respuesta elegida está en esa lista.
+   Una opción llamada «Otro» abre un campo para escribir.
+   ================================================================ */
+const SI_NO = ["Sí", "No"];
+const SI_NO_NS = ["Sí", "No", "No lo sé"];
+
+const SECCIONES = [
+  { titulo: "Tus datos", preguntas: [
+    { id: "nombre", label: "Nombre y apellidos", type: "text", valor: "Roberto" },
+    { id: "empresa", label: "Nombre de la empresa", type: "text" },
+    { id: "email", label: "Email", type: "email" },
+  ]},
+
+  { titulo: "Lo que me contaste: confírmalo o corrígelo", preguntas: [
+    { id: "doscar", label: "La gestión (compras, ventas, albaranes) la lleváis en Doscar Gestión. ¿Es correcto?", type: "radio", options: SI_NO,
+      extras: [{ id: "version", label: "¿Qué versión tenéis? Si no es correcto, cuéntame cómo lo lleváis", type: "text" }] },
+    { id: "factusol", label: "Facturáis con Factusol y la contabilidad la lleváis en Contasol. ¿Es correcto?", type: "radio", options: SI_NO,
+      extras: [{ id: "detalle", label: "Si no es así, cuéntame cómo", type: "text", cuando: ["No"] }] },
+    { id: "instalacion", label: "¿Dónde está instalado cada programa?", type: "matrix",
+      rows: ["Doscar", "Factusol"], options: ["En un PC de la oficina", "En la nube", "No lo sé"] },
+    { id: "pedidosDia", label: "¿Cuántos pedidos entran de media al día?", type: "number", unit: "pedidos",
+      extras: [{ id: "carga", label: "¿Hay días con más carga? ¿Cuáles?", type: "text" }] },
+    { id: "formatoPedidos", label: "Los comerciales os mandan los pedidos por correo. ¿En qué formato llegan?", type: "checkbox",
+      options: ["Foto de una hoja", "PDF", "Excel", "Texto en el correo", "WhatsApp", "Otro"] },
+    { id: "ayuda", label: "Hoy grabas tú los pedidos a mano. ¿Te ayuda alguien?", type: "radio",
+      options: ["No, los grabo yo solo", "Sí, me ayuda alguien"],
+      extras: [{ id: "quien", label: "¿Quién?", type: "text", cuando: ["Sí, me ayuda alguien"] }] },
+  ]},
+
+  { titulo: "Vuestro negocio", preguntas: [
+    { id: "zona", label: "¿Qué zona cubrís?", type: "text", placeholder: "Ej.: provincia de Granada y costa" },
+    { id: "clientesTipo", label: "¿A quién vendéis?", type: "checkbox",
+      options: ["Hostelería", "Tiendas y alimentación", "Particulares", "Otras distribuidoras", "Otro"] },
+    { id: "personas", label: "¿Cuántas personas trabajan en cada área?", type: "numbers",
+      fields: ["Comerciales", "Reparto", "Almacén", "Oficina"] },
+    { id: "clientesActivos", label: "¿Cuántos clientes activos tenéis?", type: "number", unit: "clientes" },
+    { id: "referencias", label: "¿Cuántas referencias tenéis en el catálogo?", type: "number", unit: "referencias" },
+    { id: "otrosProductos", label: "Además de vino, ¿qué más vendéis?", type: "checkbox",
+      options: ["Solo vino", "Destilados", "Cerveza", "Refrescos y agua", "Aceite", "Alimentación", "Otro"] },
+    { id: "otrosEnCatalogo", label: "¿Te interesaría tener esos productos también en el catálogo, con su control?", type: "radio",
+      options: ["Sí", "No", "Lo estoy pensando"],
+      extras: [{ id: "cuales", label: "¿Cuáles?", type: "text", cuando: ["Sí", "Lo estoy pensando"] }] },
+    { id: "pedidoMedio", label: "¿Cuánto suele ser un pedido medio?", type: "number", unit: "€" },
+  ]},
+
+  { titulo: "El catálogo y las propuestas", preguntas: [
+    { id: "winerimQuien", label: "¿Quién mantiene hoy el catálogo en Winerim (altas, precios, fotos, fichas)?", type: "radio",
+      options: ["Yo", "Un comercial", "Otra persona", "Lo hace Winerim o la bodega", "No se actualiza casi nunca", "Otro"],
+      extras: [{ id: "horas", label: "¿Cuánto tiempo le lleva a la semana?", type: "number", unit: "horas/semana" }] },
+    { id: "cambiosPrecios", label: "¿Cada cuánto cambian los precios o entran vinos nuevos?", type: "radio",
+      options: ["Cada semana", "Cada mes", "Cada temporada", "Cuando lo cambia la bodega"] },
+    { id: "propuestas", label: "Propuestas o cartas de vinos personalizadas", type: "numbers",
+      fields: [{ id: "mes", label: "¿Cuántas al mes, aprox.?" }, { id: "minutos", label: "Minutos por cada una" }] },
+    { id: "propuestasQuien", label: "¿Quién las hace? Puedes marcar varias.", type: "checkbox",
+      options: ["Yo", "Los comerciales", "Otra persona", "No hacemos propuestas"] },
+    { id: "propuestasEnvio", label: "¿Cómo se las hacéis llegar al cliente?", type: "checkbox",
+      options: ["En papel", "PDF", "WhatsApp", "En el móvil del comercial", "Otro"] },
+  ]},
+
+  { titulo: "La visita y la toma del pedido", preguntas: [
+    { id: "tomaPedido", label: "¿Cómo toma hoy el comercial el pedido?", type: "checkbox",
+      options: ["Papel o talonario", "WhatsApp", "Llamada", "Excel", "Otro"] },
+    { id: "datosPedido", label: "¿Qué datos lleva hoy un pedido que no puedan faltar?", type: "checkbox",
+      options: ["Observaciones", "Hora o franja de entrega", "Forma de pago", "Dirección de entrega distinta", "Persona de contacto", "Descuento pactado", "Otro"] },
+  ]},
+
+  { titulo: "Precios, descuentos y promociones", preguntas: [
+    { id: "tarifas", label: "¿Tenéis tarifas distintas según el cliente o el tipo de cliente?", type: "radio", options: SI_NO,
+      extras: [{ id: "como", label: "¿Cómo las organizáis? (por cliente, por grupo, por zona…)", type: "text", cuando: ["Sí"] }] },
+    { id: "descuentoFijo", label: "¿Algunos clientes tienen un descuento fijo?", type: "radio", options: SI_NO },
+    { id: "comercialPrecio", label: "¿Puede el comercial cambiar un precio o dar un descuento?", type: "radio",
+      options: ["No puede", "Sí, hasta un límite", "Sí, con mi permiso"],
+      extras: [{ id: "limite", label: "¿Hasta cuánto?", type: "text", cuando: ["Sí, hasta un límite", "Sí, con mi permiso"] }] },
+    { id: "tiposPromo", label: "¿Qué tipos de promoción usáis?", type: "checkbox",
+      options: ["X+Y botellas (11+1, 24+12…)", "Precio especial por cantidad", "Descuento en %", "Regalo de otra cosa (copas, magnum…)", "Otro"] },
+    { id: "promoQuien", label: "¿Quién decide las promociones?", type: "radio", options: ["La bodega", "Nosotros", "Los dos"] },
+    { id: "promoFechas", label: "¿Las promociones tienen fecha de inicio y de fin?", type: "radio", options: SI_NO },
+    { id: "promoClientes", label: "¿Una promoción vale para todos los clientes o solo para algunos?", type: "radio",
+      options: ["Para todos", "Para algunos", "Depende"] },
+    { id: "promoJuntar", label: "¿Se pueden juntar varios vinos para llegar a la cantidad de una promoción? (por ejemplo, 6 de uno y 6 de otro para un 11+1)", type: "radio",
+      options: ["Sí", "No", "Depende"] },
+    { id: "promoFallo", label: "¿Se os ha olvidado alguna vez aplicar una promoción, o se ha aplicado mal?", type: "radio",
+      options: ["Nunca", "Alguna vez", "A menudo"] },
+    { id: "promoAbono", label: "¿La bodega os abona después las botellas regaladas?", type: "radio",
+      options: ["Sí", "No", "Solo algunas bodegas"] },
+    { id: "promoInforme", label: "¿Os vendría bien un informe para reclamárselas a la bodega?", type: "radio", options: SI_NO },
+    { id: "promoAlbaran", label: "¿Cómo aparece hoy la botella regalada en el albarán y en la factura?", type: "radio",
+      options: ["A precio 0", "Como descuento", "No aparece", "Otro"] },
+    { id: "recargo", label: "¿Tenéis clientes en recargo de equivalencia (tiendas, minoristas)?", type: "radio", options: SI_NO_NS },
+  ]},
+
+  { titulo: "Preparación del pedido y carga del camión", preguntas: [
+    { id: "prepQuien", label: "¿Quién prepara los pedidos en el almacén?", type: "radio",
+      options: ["Yo", "Personal de almacén", "El repartidor", "El comercial", "Otro"] },
+    { id: "prepPapel", label: "¿Con qué papel se prepara?", type: "radio",
+      options: ["El pedido del comercial", "Un albarán impreso", "Una hoja de carga", "Ninguno, de memoria", "Otro"] },
+    { id: "prepPlazo", label: "¿Cuánto tiempo pasa desde que se toma el pedido hasta que se entrega?", type: "radio",
+      options: ["El mismo día", "Al día siguiente", "2–3 días", "Depende de la ruta"] },
+    { id: "furgonetas", label: "¿Cuántas furgonetas o camiones salen al día?", type: "number", unit: "vehículos",
+      extras: [{ id: "ruta", label: "¿Cada uno tiene su ruta fija?", type: "radio", options: ["Sí", "No", "A veces"] }] },
+    { id: "cargaControl", label: "¿Quién revisa lo que se carga en el camión de cada pedido antes de salir?", type: "radio",
+      options: ["Nadie lo revisa", "Quien lo prepara", "El repartidor", "Lo reviso yo", "Otro"],
+      extras: [{ id: "como", label: "¿Cómo se controla? (opcional)", type: "text" }] },
+    { id: "hojaCarga", label: "¿Os vendría bien una hoja de carga por furgoneta con el total de cajas de todos sus pedidos?", type: "radio", options: SI_NO },
+    { id: "faltaMercancia", label: "Cuando falta mercancía al preparar, ¿qué hacéis normalmente?", type: "checkbox",
+      options: ["Sale incompleto y lo que falta va en otro envío", "Se espera a tenerlo todo", "Se cambia por otro vino", "Se quita del pedido", "Depende del cliente"] },
+    { id: "faltaApunte", label: "Si sale incompleto, ¿dónde queda apuntado lo que falta?", type: "radio",
+      options: ["En el albarán", "En un papel o libreta aparte", "En el programa", "No queda apuntado", "Otro"],
+      extras: [{ id: "quien", label: "¿Quién se acuerda de mandarlo después?", type: "text" }] },
+    { id: "faltaCliente", label: "¿El cliente sabe lo que falta antes de que llegue el repartidor, o se entera en la entrega?", type: "radio",
+      options: ["Lo sabe antes", "Se entera en la entrega", "A veces ni se entera"] },
+    { id: "faltaRegalo", label: "Si falta parte de un pedido con promoción, ¿se entrega el regalo igualmente o espera a que se complete?", type: "radio",
+      options: ["Se entrega igualmente", "Espera a que se complete", "Depende"] },
+    { id: "facturaQue", label: "¿Se factura lo que se pidió o lo que se entregó de verdad?", type: "radio",
+      options: ["Lo pedido", "Lo entregado", "Depende"] },
+  ]},
+
+  { titulo: "Entrega, roturas y devoluciones", preguntas: [
+    { id: "albaranImpreso", label: "¿El repartidor lleva el albarán impreso?", type: "radio", options: SI_NO,
+      extras: [{ id: "copias", label: "¿Cuántas copias?", type: "select", options: ["1", "2", "3", "Más de 3"], cuando: ["Sí"] }] },
+    { id: "firma", label: "¿El cliente firma el albarán?", type: "radio", options: ["Sí, siempre", "A veces", "No"] },
+    { id: "papelDestino", label: "¿Dónde acaba el albarán firmado?", type: "radio",
+      options: ["Vuelve a la oficina", "Se lo queda el cliente", "Se queda en la furgoneta", "A veces se pierde", "Otro"],
+      extras: [{ id: "tarda", label: "¿Cuánto tarda en volver a la oficina?", type: "select", options: ["El mismo día", "Al día siguiente", "Unos días", "Una semana o más", "No vuelve"] }] },
+    { id: "cotejo", label: "¿Quién comprueba que lo pedido, lo cargado y lo entregado coinciden?", type: "radio",
+      options: ["Nadie", "Yo", "El repartidor", "El almacén", "Otro"],
+      extras: [{ id: "como", label: "¿Cómo se hace? (opcional)", type: "text" }] },
+    { id: "rotura", label: "Si una botella se rompe en el transporte, ¿qué pasa?", type: "checkbox",
+      options: ["Se repone en el siguiente envío", "Se abona", "Se descuenta del albarán", "La asume el repartidor", "No hay un criterio fijo"] },
+    { id: "roturaApunte", label: "¿Dónde queda apuntada la rotura?", type: "radio",
+      options: ["En el albarán", "En el programa", "En un papel aparte", "No se apunta", "Otro"],
+      extras: [{ id: "mes", label: "¿Cuántas roturas hay al mes, más o menos?", type: "number", unit: "al mes" }] },
+    { id: "clienteAusente", label: "¿Qué pasa si el cliente no está o el local está cerrado?", type: "checkbox",
+      options: ["Se vuelve con el pedido", "Se llama al cliente", "Se deja en un local cercano", "Se deja dentro (hay llave o acceso)", "Otro"] },
+    { id: "incidencia", label: "¿Cómo se registra hoy una incidencia (falta algo, sobra algo, llega otro vino)?", type: "radio",
+      options: ["Se apunta a mano en el albarán", "Me lo cuentan por teléfono o WhatsApp", "Se apunta en el programa", "No se registra", "Otro"] },
+    { id: "devolucionQuien", label: "Cuando hay una devolución, ¿quién la comunica a la oficina?", type: "radio",
+      options: ["El repartidor", "El comercial", "El cliente llama", "Otro"] },
+    { id: "devolucionPrograma", label: "¿Cómo registráis la devolución en el programa?", type: "radio",
+      options: ["Albarán en negativo", "Abono", "Factura rectificativa", "No lo sé"] },
+    { id: "devolucionMotivos", label: "¿Qué motivos de devolución son los más habituales?", type: "checkbox",
+      options: ["Rotura", "Error en el pedido", "No le gustó", "Caducidad o defecto", "Otro"] },
+  ]},
+
+  { titulo: "Cobros", preguntas: [
+    { id: "formasCobro", label: "¿Cómo cobráis?", type: "checkbox",
+      options: ["Contado al repartidor", "Transferencia", "Recibo domiciliado", "Pagaré", "Otro"] },
+    { id: "cobraQuien", label: "¿Cobra el comercial o el repartidor?", type: "radio",
+      options: ["El comercial", "El repartidor", "Los dos", "Ninguno"] },
+    { id: "pendiente", label: "¿Cómo sabéis lo que tiene pendiente cada cliente?", type: "radio",
+      options: ["Lo miro en el programa", "En un Excel propio", "En una libreta", "Me lo dice el comercial", "No lo tengo claro", "Otro"] },
+    { id: "horasCobros", label: "¿Cuántas horas a la semana se dedican a cuadrar cobros?", type: "number", unit: "horas/semana" },
+  ]},
+
+  { titulo: "Programas y conexión", intro: "La parte más importante.",
+    destacado: "Mi aplicación no sustituye a vuestros programas: se conecta con ellos. Las facturas las sigue emitiendo vuestro programa, y la aplicación se encarga de que le lleguen los pedidos sin que nadie los teclee.",
+    preguntas: [
+    { id: "grabaDonde", label: "Hoy, ¿un mismo pedido lo grabas en Doscar y en Factusol, o solo en uno de los dos?", type: "radio",
+      options: ["Solo en Doscar", "Solo en Factusol", "En los dos"] },
+    { id: "programasFuncion", label: "¿Qué hace cada programa? ¿En cuál se crean el albarán y la factura?", type: "matrix",
+      rows: ["El albarán se crea en", "La factura se crea en"], options: ["Doscar", "Factusol", "Los dos"],
+      extras: [{ id: "detalle", label: "Si quieres, explícamelo un poco más", type: "textarea" }] },
+    { id: "destinoPedidos", label: "¿Dónde quieres que entren los pedidos de los comerciales?", type: "radio",
+      options: ["Como albarán en Factusol", "Como albarán en Doscar", "En los dos", "Como pedido de cliente, para revisarlo antes", "No lo sé"] },
+    { id: "datosMaestros", label: "¿Qué programa tiene los datos buenos de cada cosa?", type: "matrix",
+      rows: ["Clientes", "Artículos", "Precios", "Stock"], options: ["Doscar", "Factusol", "Winerim", "Ninguno", "No lo sé"] },
+    { id: "enlaceContasol", label: "Me dijiste que el enlace de Doscar con Contasol pasa las ventas y compras a la contabilidad, pero no las facturas a Factusol. ¿Puedes explicármelo un poco más?", type: "textarea" },
+    { id: "tiempoGrabar", label: "¿Cuánto tardas en grabar un pedido en cada programa?", type: "numbers",
+      fields: [{ id: "doscar", label: "Doscar (minutos)" }, { id: "factusol", label: "Factusol (minutos)" }] },
+    { id: "numeracion", label: "¿Cómo numeráis los albaranes? Pon un ejemplo.", type: "text", placeholder: "Ej.: A-2026-0153" },
+    { id: "series", label: "¿Tenéis varias series de albaranes o facturas?", type: "radio",
+      options: ["No, una sola serie", "Sí, por año", "Sí, por comercial", "Sí, por otro criterio"],
+      extras: [{ id: "detalle", label: "¿Cuáles?", type: "text", cuando: ["Sí, por año", "Sí, por comercial", "Sí, por otro criterio"] }] },
+    { id: "reinicio", label: "¿La numeración vuelve a empezar cada año?", type: "radio", options: SI_NO_NS },
+    { id: "comoFacturais", label: "¿Cómo facturáis?", type: "radio",
+      options: ["Una factura por albarán", "Una factura al mes por cliente con todos sus albaranes", "Depende del cliente"] },
+    { id: "codigoArticulo", label: "¿Cada artículo tiene su propio código en el programa?", type: "radio",
+      options: ["Sí, el mismo en Doscar y en Factusol", "Sí, pero distinto en cada programa", "No", "No lo sé"] },
+    { id: "codigoCliente", label: "¿Con qué se reconoce que un cliente ya existe en el programa?", type: "radio",
+      options: ["Por su código de cliente", "Por su CIF", "Por su nombre", "No lo sé"] },
+    { id: "obligatoriosCliente", label: "Al dar de alta un cliente nuevo, ¿qué datos son obligatorios?", type: "checkbox",
+      options: ["Código", "Nombre comercial", "Nombre fiscal", "CIF", "Dirección", "Teléfono", "Email", "Forma de pago", "Otro"] },
+    { id: "obligatoriosArticulo", label: "Al dar de alta un artículo nuevo, ¿qué datos son obligatorios?", type: "checkbox",
+      options: ["Código", "Descripción", "Precio", "Tipo de IVA", "Familia", "Proveedor o bodega", "Unidades por caja", "Otro"] },
+    { id: "soporte", label: "¿Quién os da soporte de Doscar y de Factusol?", type: "text", placeholder: "Empresa o persona y, si quieres, su contacto (opcional)" },
+    { id: "contabilidad", label: "¿Lleváis la contabilidad vosotros o una gestoría?", type: "radio",
+      options: ["La llevo yo", "Una gestoría", "Los dos"],
+      extras: [{ id: "detalle", label: "¿Qué le pasáis a la gestoría y cada cuánto?", type: "text", cuando: ["Una gestoría", "Los dos"] }] },
+    { id: "estructura", label: "¿Me podrías mandar por email la estructura de importación de Factusol que comentaste?", type: "radio",
+      options: ["Sí, te la mando", "Prefiero dártela en la visita"] },
+  ]},
+
+  { titulo: "Stock, compras, informes y estadísticas", preguntas: [
+    { id: "stock", label: "¿Lleváis el stock en el programa?", type: "radio", options: SI_NO,
+      extras: [
+        { id: "programa", label: "¿En cuál?", type: "select", options: ["Doscar", "Factusol", "Otro"], cuando: ["Sí"] },
+        { id: "unidad", label: "¿Por botellas o por cajas?", type: "select", options: ["Por botellas", "Por cajas", "Las dos"], cuando: ["Sí"] },
+      ] },
+    { id: "stockMovil", label: "¿Os vendría bien que el comercial viera en el móvil el stock que hay en almacén?", type: "radio", options: SI_NO },
+    { id: "lotes", label: "¿Controláis añadas o lotes?", type: "radio", options: ["Añadas", "Lotes", "Las dos", "Ninguna"] },
+    { id: "compras", label: "Albaranes de compra (de proveedores y bodegas)", type: "numbers",
+      fields: [{ id: "mes", label: "¿Cuántos entran al mes?" }, { id: "minutos", label: "Minutos en grabar cada uno" }] },
+    { id: "comprasApp", label: "¿Te interesaría que los albaranes de compra se registraran desde la aplicación?", type: "radio",
+      options: ["Sí", "No", "Más adelante"] },
+
+    { id: "estadisticas", label: "¿Sacas hoy estadísticas de vuestra actividad?", type: "radio",
+      options: ["Sí, con frecuencia", "Alguna vez", "Casi nunca", "No"] },
+    { id: "estadDe", label: "¿De qué las sacas?", type: "checkbox",
+      options: ["Pedidos", "Ventas", "Clientes", "Productos", "Comerciales", "Promociones", "Roturas", "Devoluciones", "Incidencias en la entrega", "Cobros y pendientes", "Compras a proveedores", "Stock", "Márgenes", "Otro"] },
+    { id: "estadFuente", label: "¿De dónde salen esos datos?", type: "checkbox",
+      options: ["Doscar", "Factusol", "Contasol", "Excel propio", "Winerim", "Los hago a mano", "Otro"] },
+    { id: "estadFrecuencia", label: "¿Cada cuánto las miras?", type: "radio",
+      options: ["Cada día", "Cada semana", "Cada mes", "Cada trimestre", "Solo al cierre del año"] },
+    { id: "estadTiempo", label: "¿Cuánto tiempo te lleva prepararlas cada vez?", type: "radio",
+      options: ["Menos de 15 minutos", "Entre 15 minutos y 1 hora", "Entre 1 y 3 horas", "Más de 3 horas"] },
+    { id: "estadUso", label: "¿Para qué las usas?", type: "checkbox",
+      options: ["Decidir compras", "Seguir a los comerciales", "Negociar con bodegas", "Reclamar promociones a la bodega", "Cuadrar la contabilidad", "Detectar clientes que dejan de comprar", "Otro"] },
+    { id: "estadFalta", label: "¿Hay alguna cifra que te gustaría saber y hoy no puedes sacar, o te cuesta mucho?", type: "textarea" },
+
+    { id: "verPedidos", label: "Pedidos: ¿qué te interesa ver?", type: "checkbox",
+      options: ["Pedidos por día, semana o mes", "Pedido medio", "Por comercial", "Por zona o ruta", "Pedidos incompletos", "Pedidos cancelados"] },
+    { id: "verClientes", label: "Clientes: ¿qué te interesa ver?", type: "checkbox",
+      options: ["Los que más compran", "Los que llevan tiempo sin pedir", "Los nuevos del mes", "Qué compra cada uno", "Su pendiente de cobro"] },
+    { id: "verProductos", label: "Productos: ¿qué te interesa ver?", type: "checkbox",
+      options: ["Los más vendidos", "Los que no se mueven", "Quién compró un artículo y cuándo", "Ventas por bodega, D.O. o tipo", "Evolución de un vino"] },
+    { id: "verRoturas", label: "Roturas y devoluciones: ¿qué te interesa ver?", type: "checkbox",
+      options: ["Cuántas hay al mes", "Su coste", "Por repartidor o ruta", "Por producto", "Por motivo", "Por cliente"] },
+    { id: "verPromos", label: "Promociones: ¿qué te interesa ver?", type: "checkbox",
+      options: ["Cuánto vende cada promoción", "Botellas regaladas y lo que valen", "Lo que hay que reclamar a cada bodega"] },
+    { id: "verComo", label: "¿Cómo te gustaría verlas?", type: "checkbox",
+      options: ["En pantalla, al momento", "Un resumen por email cada semana o mes", "Exportadas a Excel", "Impresas o en PDF"] },
+    { id: "informes", label: "¿Qué informes te gustaría tener al momento?", type: "checkbox",
+      options: ["Ventas del mes frente al anterior", "Vinos más vendidos", "Quién compró un artículo y cuándo", "Clientes que llevan tiempo sin pedir", "Ventas por comercial", "Promociones y regalos", "Pendiente de cobro", "Otro"] },
+  ]},
+
+  { titulo: "Tu día a día", preguntas: [
+    { id: "horasFuera", label: "¿Cuántas horas a la semana dedicas a papeleo fuera de tu horario?", type: "number", unit: "horas/semana" },
+    { id: "faltas", label: "Si tú faltas una semana, ¿la parte de administración sigue funcionando?", type: "radio",
+      options: ["Sí, sin problema", "Con dificultades", "Se para"] },
+    { id: "masTiempo", label: "¿Qué es lo que más tiempo te quita hoy?", type: "textarea" },
+    { id: "cambiaria", label: "Si pudieras cambiar una sola cosa de cómo trabajáis, ¿cuál sería?", type: "textarea" },
+    { id: "algoMas", label: "¿Hay algo que no te haya preguntado y te gustaría que la aplicación hiciera?", type: "textarea" },
+  ]},
+
+  // La 13 es la calculadora, que va aparte.
+
+  { titulo: "Para terminar", numero: 14, preguntas: [
+    { id: "visitaDia", label: "Para la visita de diciembre, ¿qué día te viene mejor?", type: "radio",
+      ayuda: "La visita sería a partir de las 13:30.",
+      options: ["Miércoles 9", "Jueves 10"] },
+    { id: "demoQuien", label: "¿Quién más debería estar en la demostración?", type: "checkbox",
+      options: ["Solo yo", "Algún comercial", "El repartidor", "Alguien de almacén", "Otro"] },
+    { id: "web", label: "Sobre la web y el hosting que comentaste: ¿con quién lo tenéis y cuándo vence?", type: "text", placeholder: "Opcional" },
+    { id: "comentarios", label: "¿Quieres comentarme algo más?", type: "textarea" },
+  ]},
+];
+
+/* ================================================================
+   CALCULADORA
+   ================================================================ */
+const CALC = [
+  { grupo: "Pedidos", id: "pedidos", label: "Pedidos que se graban", unidad: "al día", valor: 75 },
+  { grupo: "Pedidos", id: "minPedido", label: "Tiempo por pedido", ayuda: "Descargar, grabar, revisar y pasar a Factusol", unidad: "minutos", valor: 2.8, paso: 0.1 },
+  { grupo: "Propuestas y cartas", id: "propuestas", label: "Propuestas que se preparan", unidad: "al día", valor: 0, paso: 0.1 },
+  { grupo: "Propuestas y cartas", id: "minPropuesta", label: "Tiempo por propuesta", unidad: "minutos", valor: 30 },
+  { grupo: "Otras tareas", id: "otras", label: "Otras tareas de meter datos", ayuda: "Cobros, clientes, compras…", unidad: "min/día", valor: 0 },
+  { grupo: "Otras tareas", id: "llamadas", label: "Llamadas para aclarar pedidos", unidad: "al mes", valor: 0 },
+  { grupo: "Otras tareas", id: "minLlamada", label: "Tiempo por llamada", unidad: "minutos", valor: 5 },
+  { grupo: "Errores", id: "errores", label: "Errores en pedidos", unidad: "al mes", valor: 0 },
+  { grupo: "Errores", id: "costeError", label: "Coste medio de un error", ayuda: "Reenvío, portes, descuentos…", unidad: "€", valor: 0 },
+  { grupo: "Base del cálculo", id: "hora", label: "Valor de una hora de trabajo", unidad: "€/hora", valor: 8, paso: 0.5 },
+  { grupo: "Base del cálculo", id: "dias", label: "Días laborables", unidad: "al mes", valor: 22 },
+];
+
+/* ================================================================
+   PINTADO
+   ================================================================ */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const campos = (f) => f.map((x) => (typeof x === "string" ? { id: x.toLowerCase().normalize("NFD").replace(/[^a-z]/g, ""), label: x } : x));
+
+function htmlOpciones(nombre, tipo, opciones, extraClase = "") {
+  const dos = opciones.length > 3 && opciones.every((o) => o.length < 34) ? " dos" : "";
+  let h = `<div class="opciones${dos}${extraClase}">`;
+  for (const o of opciones) {
+    h += `<label class="opcion"><input type="${tipo}" name="${nombre}" value="${esc(o)}"><span>${esc(o)}</span></label>`;
+  }
+  h += `</div>`;
+  if (opciones.includes("Otro")) {
+    h += `<label class="campo oculto" data-otro="${nombre}"><span>¿Cuál?</span><input type="text" name="${nombre}__otro"></label>`;
+  }
+  return h;
+}
+
+function htmlCampo(nombre, q) {
+  switch (q.type) {
+    case "textarea":
+      return `<textarea name="${nombre}" ${q.placeholder ? `placeholder="${esc(q.placeholder)}"` : ""}></textarea>`;
+    case "number":
+      return `<div class="con-unidad"><input type="number" inputmode="decimal" min="0" step="any" name="${nombre}"><span class="unidad">${esc(q.unit || "")}</span></div>`;
+    case "select":
+      return `<select name="${nombre}"><option value="">Elige una opción</option>${q.options.map((o) => `<option>${esc(o)}</option>`).join("")}</select>`;
+    case "radio":
+    case "checkbox":
+      return htmlOpciones(nombre, q.type, q.options);
+    default:
+      return `<input type="${q.type === "email" ? "email" : "text"}" name="${nombre}" ${q.valor ? `value="${esc(q.valor)}"` : ""} ${q.placeholder ? `placeholder="${esc(q.placeholder)}"` : ""}>`;
+  }
+}
+
+function htmlPregunta(q) {
+  const agrupa = ["radio", "checkbox", "matrix", "numbers"].includes(q.type);
+  let cuerpo = "";
+  if (q.type === "matrix") {
+    q.rows.forEach((fila, i) => {
+      cuerpo += `<div class="matriz-fila"><div class="fila-nombre">${esc(fila)}</div>${htmlOpciones(`${q.id}__${i}`, "radio", q.options)}</div>`;
+    });
+  } else if (q.type === "numbers") {
+    cuerpo = `<div class="numeros">${campos(q.fields).map((f) =>
+      `<label><span>${esc(f.label)}</span><input type="number" inputmode="decimal" min="0" step="any" name="${q.id}__${f.id}"></label>`).join("")}</div>`;
+  } else {
+    cuerpo = htmlCampo(q.id, q);
+  }
+  for (const x of q.extras || []) {
+    const nombre = `${q.id}__${x.id}`;
+    const cuando = x.cuando ? ` data-depende="${q.id}" data-cuando="${esc(JSON.stringify(x.cuando))}"` : "";
+    const clase = x.cuando ? " oculto" : "";
+    if (x.type === "radio") {
+      cuerpo += `<div class="campo${clase}"${cuando}><span>${esc(x.label)}</span>${htmlOpciones(nombre, "radio", x.options)}</div>`;
+    } else {
+      cuerpo += `<label class="campo${clase}"${cuando}><span>${esc(x.label)}</span>${htmlCampo(nombre, x)}</label>`;
+    }
+  }
+  if (agrupa) {
+    return `<fieldset class="pregunta" data-q="${q.id}"><legend class="enunciado">${esc(q.label)}</legend>${q.ayuda ? `<p class="ayuda">${esc(q.ayuda)}</p>` : ""}${cuerpo}</fieldset>`;
+  }
+  return `<div class="pregunta" data-q="${q.id}"><label class="enunciado" for="f_${q.id}">${esc(q.label)}</label>${cuerpo.replace(`name="${q.id}"`, `id="f_${q.id}" name="${q.id}"`)}</div>`;
+}
+
+function pintar() {
+  let h = "";
+  SECCIONES.forEach((s, i) => {
+    const n = s.numero || i + 1;
+    s._n = n;
+    h += `<section class="seccion"><h2><span class="num">${n}.</span> ${esc(s.titulo)}</h2>`;
+    if (s.intro) h += `<p class="intro-seccion">${esc(s.intro)}</p>`;
+    if (s.destacado) h += `<div class="destacado">${esc(s.destacado)}</div>`;
+    h += s.preguntas.map(htmlPregunta).join("") + `</section>`;
+  });
+  $("#secciones").innerHTML = h;
+  // La calculadora va entre la 12 y la 14.
+  const secciones = document.querySelectorAll("#secciones > section");
+  secciones[secciones.length - 1].before($("#seccion-calc"));
+
+  const grupos = [...new Set(CALC.map((c) => c.grupo))];
+  $("#calcDatos").innerHTML = grupos.map((g) =>
+    `<div class="calc-grupo"><h3>${esc(g)}</h3>${CALC.filter((c) => c.grupo === g).map((c) =>
+      `<label class="calc-fila"><span class="nombre">${esc(c.label)}${c.ayuda ? `<small>${esc(c.ayuda)}</small>` : ""}</span>` +
+      `<span class="valor"><input type="number" inputmode="decimal" min="0" step="${c.paso || 1}" name="calc_${c.id}" value="${c.valor}"><span class="unidad">${esc(c.unidad)}</span></span></label>`
+    ).join("")}</div>`).join("");
+}
+
+/* ================================================================
+   LÓGICA: «Otro», campos condicionados, radios que se desmarcan
+   ================================================================ */
+function valoresDe(nombre) {
+  return [...document.querySelectorAll(`[name="${CSS.escape(nombre)}"]`)].filter((e) => e.checked).map((e) => e.value);
+}
+
+function actualizarVisibles() {
+  document.querySelectorAll("[data-otro]").forEach((el) => {
+    el.classList.toggle("oculto", !valoresDe(el.dataset.otro).includes("Otro"));
+  });
+  document.querySelectorAll("[data-depende]").forEach((el) => {
+    const cuando = JSON.parse(el.dataset.cuando);
+    el.classList.toggle("oculto", !valoresDe(el.dataset.depende).some((v) => cuando.includes(v)));
+  });
+}
+
+// Pulsar otra vez un radio ya marcado lo desmarca, por si se elige sin querer.
+let radioPrevio = null;
+document.addEventListener("pointerdown", (e) => {
+  const label = e.target.closest("label.opcion");
+  const input = label && label.querySelector('input[type="radio"]');
+  radioPrevio = input && input.checked ? input : null;
+});
+document.addEventListener("click", (e) => {
+  const label = e.target.closest("label.opcion");
+  const input = label && label.querySelector('input[type="radio"]');
+  if (input && input === radioPrevio && e.target === input) {
+    input.checked = false;
+    radioPrevio = null;
+    cambio();
+  }
+});
+
+/* ================================================================
+   CALCULADORA
+   ================================================================ */
+// A mano y no con toLocaleString: en español «7392» sale sin punto de miles.
+const fmt = (n, d = 0) => {
+  const [ent, dec] = n.toFixed(d).split(".");
+  return ent.replace(/\B(?=(\d{3})+(?!\d))/g, ".") + (dec ? "," + dec : "");
+};
+const eur = (n) => fmt(Math.round(n)) + " €";
+function num(nombre) {
+  const v = parseFloat(String(document.querySelector(`[name="${nombre}"]`).value).replace(",", "."));
+  return isFinite(v) && v > 0 ? v : 0;
+}
+function calcular() {
+  const c = Object.fromEntries(CALC.map((x) => [x.id, num(`calc_${x.id}`)]));
+  const horasDia = (c.pedidos * c.minPedido + c.propuestas * c.minPropuesta + c.otras) / 60;
+  const horasMes = horasDia * c.dias + (c.llamadas * c.minLlamada) / 60;
+  const jornadas = horasMes / 8;
+  const costeTiempo = horasMes * c.hora;
+  const costeErrores = c.errores * c.costeError;
+  const totalMes = costeTiempo + costeErrores;
+  return { horasDia, horasMes, jornadas, costeTiempo, costeErrores, totalMes, totalAno: totalMes * 12 };
+}
+function pintarCalculo() {
+  const r = calcular();
+  const filas = [
+    ["Horas al día", fmt(r.horasDia, 1) + " h"],
+    ["Horas al mes", fmt(r.horasMes, 0) + " h"],
+    ["Jornadas de 8 h al mes", fmt(r.jornadas, 1)],
+    ["Coste del tiempo al mes", eur(r.costeTiempo), "separa"],
+    ["Coste de los errores al mes", eur(r.costeErrores)],
+    ["Total al mes", eur(r.totalMes), "separa total"],
+    ["Total al año", eur(r.totalAno), "total"],
+  ];
+  $("#calcResultados").innerHTML = `<h3>Resultado</h3>` +
+    filas.map(([n, v, c]) => `<div class="res-fila ${c || ""}"><span>${n}</span><span>${v}</span></div>`).join("");
+  $("#calcTitular").innerHTML =
+    `Cada mes dedicáis <strong>${fmt(r.horasMes, 0)} horas</strong> a meter datos a mano: el equivalente a <strong>${fmt(r.jornadas, 1)} jornadas completas</strong> de trabajo. Hoy eso os cuesta unos <strong>${eur(r.totalMes)} al mes</strong> (${eur(r.totalAno)} al año).`;
+  return r;
+}
+
+/* ================================================================
+   RESPUESTAS: texto legible por pregunta
+   ================================================================ */
+function textoDe(nombre) {
+  const els = [...document.querySelectorAll(`[name="${CSS.escape(nombre)}"]`)];
+  if (!els.length) return "";
+  if (els[0].type === "radio" || els[0].type === "checkbox") {
+    const vals = valoresDe(nombre).map((v) => {
+      if (v === "Otro") {
+        const otro = document.querySelector(`[name="${CSS.escape(nombre + "__otro")}"]`);
+        return otro && otro.value.trim() ? `Otro: ${otro.value.trim()}` : "Otro";
+      }
+      return v;
+    });
+    return vals.join(", ");
+  }
+  return els[0].value.trim();
+}
+
+function respuestaDe(q) {
+  let partes = [];
+  if (q.type === "matrix") {
+    partes = q.rows.map((f, i) => { const v = textoDe(`${q.id}__${i}`); return v ? `${f}: ${v}` : ""; }).filter(Boolean);
+  } else if (q.type === "numbers") {
+    partes = campos(q.fields).map((f) => { const v = textoDe(`${q.id}__${f.id}`); return v ? `${f.label}: ${v}` : ""; }).filter(Boolean);
+  } else {
+    const v = textoDe(q.id);
+    if (v) partes.push(q.type === "number" && q.unit ? `${v} ${q.unit}` : v);
+  }
+  for (const x of q.extras || []) {
+    const contenedor = document.querySelector(`[name="${CSS.escape(q.id + "__" + x.id)}"]`)?.closest(".campo");
+    if (contenedor && contenedor.classList.contains("oculto")) continue;
+    const v = textoDe(`${q.id}__${x.id}`);
+    if (v) partes.push(`${x.label}: ${v}${x.type === "number" && x.unit ? " " + x.unit : ""}`);
+  }
+  return partes.join(" | ");
+}
+
+function todasLasPreguntas() {
+  return SECCIONES.flatMap((s) => s.preguntas.map((q) => ({ s, q })));
+}
+
+function contarProgreso() {
+  const todas = todasLasPreguntas();
+  const hechas = todas.filter(({ q }) => respuestaDe(q) && !(q.valor && textoDe(q.id) === q.valor)).length;
+  $("#relleno").style.width = `${Math.round((hechas / todas.length) * 100)}%`;
+  $("#textoProgreso").textContent = `${hechas} de ${todas.length} preguntas respondidas`;
+}
+
+/* ================================================================
+   GUARDADO
+   ================================================================ */
+function leerFormulario() {
+  const datos = {};
+  for (const el of $("#formulario").elements) {
+    if (!el.name || el.name === "botcheck") continue;
+    if (el.type === "checkbox") { (datos[el.name] ||= []); if (el.checked) datos[el.name].push(el.value); }
+    else if (el.type === "radio") { if (el.checked) datos[el.name] = el.value; else if (!(el.name in datos)) datos[el.name] = ""; }
+    else datos[el.name] = el.value;
+  }
+  return datos;
+}
+function volcarFormulario(datos) {
+  for (const el of $("#formulario").elements) {
+    if (!el.name || !(el.name in datos)) continue;
+    const v = datos[el.name];
+    if (el.type === "checkbox") el.checked = Array.isArray(v) && v.includes(el.value);
+    else if (el.type === "radio") el.checked = v === el.value;
+    else el.value = v;
+  }
+}
+const hora = (d) => d.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
+const fecha = (d) => d.toLocaleDateString("es-ES", { day: "numeric", month: "long" });
+
+function guardar(manual) {
+  const ahora = new Date();
+  const previo = JSON.parse(localStorage.getItem(CLAVE_GUARDADO) || "{}");
+  try {
+    localStorage.setItem(CLAVE_GUARDADO, JSON.stringify({ ...previo, datos: leerFormulario(), guardado: ahora.toISOString() }));
+    $("#estadoGuardado").textContent = manual
+      ? `Guardado a las ${hora(ahora)}. Puedes cerrar y seguir cuando quieras.`
+      : `Guardado automáticamente a las ${hora(ahora)}`;
+  } catch {
+    $("#estadoGuardado").textContent = "No se ha podido guardar en este navegador.";
+  }
+}
+
+let temporizador;
+function cambio() {
+  actualizarVisibles();
+  pintarCalculo();
+  contarProgreso();
+  clearTimeout(temporizador);
+  temporizador = setTimeout(() => guardar(false), 800);
+}
+
+/* ================================================================
+   ENVÍO (Web3Forms)
+   ================================================================ */
+function mensaje(texto, tipo) {
+  const m = $("#mensajeEnvio");
+  m.className = `mensaje ${tipo}`;
+  m.textContent = texto;
+  m.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+async function enviar() {
+  if ($("#formulario").botcheck.checked) return;
+  if (!WEB3FORMS_KEY) {
+    mensaje("El envío todavía no está configurado (falta la clave de Web3Forms). Tus respuestas están guardadas en este navegador.", "error");
+    guardar(true);
+    return;
+  }
+  guardar(true);
+  const nombre = textoDe("nombre") || "Sin nombre";
+  const empresa = textoDe("empresa");
+  const cuerpo = {
+    access_key: WEB3FORMS_KEY,
+    subject: `Cuestionario de requisitos · ${nombre}${empresa ? " · " + empresa : ""}`,
+    from_name: "Cuestionario masku.dev",
+  };
+  const email = textoDe("email");
+  if (email) cuerpo.replyto = email;
+
+  for (const s of SECCIONES) {
+    if (s._n === 14) añadirCalculo(cuerpo);
+    cuerpo[`━━ ${s._n}. ${s.titulo.toUpperCase()}`] = "";
+    s.preguntas.forEach((q, i) => {
+      cuerpo[`${s._n}.${i + 1} ${q.label}`] = respuestaDe(q) || "—";
+    });
+  }
+
+  const boton = $("#btnEnviar");
+  boton.disabled = true;
+  boton.textContent = "Enviando…";
+  try {
+    const r = await fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify(cuerpo),
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || !j.success) throw new Error(j.message || `Error ${r.status}`);
+    const guardado = JSON.parse(localStorage.getItem(CLAVE_GUARDADO) || "{}");
+    localStorage.setItem(CLAVE_GUARDADO, JSON.stringify({ ...guardado, enviado: new Date().toISOString() }));
+    $("#formulario").classList.add("oculto");
+    document.querySelector(".acciones").classList.add("oculto");
+    $("#gracias").classList.remove("oculto");
+    window.scrollTo({ top: $("#gracias").offsetTop - 40, behavior: "smooth" });
+  } catch (err) {
+    mensaje(`No se ha podido enviar: ${err.message}. Tus respuestas siguen guardadas; prueba de nuevo en un momento.`, "error");
+  } finally {
+    boton.disabled = false;
+    boton.textContent = "Enviar respuestas";
+  }
+}
+
+function añadirCalculo(cuerpo) {
+  const r = calcular();
+  cuerpo["━━ 13. CALCULADORA"] = "";
+  for (const c of CALC) cuerpo[`13 · ${c.label} (${c.unidad})`] = String(num(`calc_${c.id}`));
+  cuerpo["13 · RESULTADO: horas al mes"] = fmt(r.horasMes, 1);
+  cuerpo["13 · RESULTADO: jornadas de 8 h al mes"] = fmt(r.jornadas, 1);
+  cuerpo["13 · RESULTADO: coste al mes"] = eur(r.totalMes);
+  cuerpo["13 · RESULTADO: coste al año"] = eur(r.totalAno);
+}
+
+/* ================================================================
+   ARRANQUE
+   ================================================================ */
+pintar();
+const guardado = JSON.parse(localStorage.getItem(CLAVE_GUARDADO) || "null");
+if (guardado?.datos) {
+  volcarFormulario(guardado.datos);
+  $("#estadoGuardado").textContent = `Recuperado lo que guardaste el ${fecha(new Date(guardado.guardado))} a las ${hora(new Date(guardado.guardado))}`;
+}
+if (guardado?.enviado) {
+  const a = $("#avisoEnviado");
+  a.textContent = `Ya me enviaste el cuestionario el ${fecha(new Date(guardado.enviado))}. Si cambias algo, puedes volver a enviarlo.`;
+  a.classList.remove("oculto");
+}
+actualizarVisibles();
+pintarCalculo();
+contarProgreso();
+
+$("#formulario").addEventListener("input", cambio);
+$("#formulario").addEventListener("change", cambio);
+$("#formulario").addEventListener("submit", (e) => e.preventDefault());
+$("#btnGuardar").addEventListener("click", () => guardar(true));
+$("#btnEnviar").addEventListener("click", enviar);
+</script>
+</body>
+</html>
